@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MudançaFácil</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#C95C28">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mudança">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Planejamento completo da sua mudança">
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F4F0EA; --card:#FFFFFF; --card2:#FDFAF6;
+  --ink:#1C1610; --ink2:#6B5E52; --ink3:#B0A090;
+  --border:#E8E0D4; --border2:#D4C8B8;
+  --terra:#C95C28; --terra-l:#F4845A; --terra-pale:#FDF0E8;
+  --sage:#3E8060;  --sage-l:#68B090;  --sage-pale:#E8F5EE;
+  --gold:#B8860B;  --gold-l:#E8B840;  --gold-pale:#FDF8E8;
+  --sky:#2E6EA0;   --sky-l:#5A98CC;   --sky-pale:#E8F2FA;
+  --plum:#7040A0;  --plum-l:#A870D8;  --plum-pale:#F2E8FA;
+  --r:20px; --rs:14px; --rss:10px;
+  --sh:0 2px 20px rgba(28,22,16,.07);
+  --sh2:0 6px 32px rgba(28,22,16,.13);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Outfit',sans-serif;
+  background:var(--bg);color:var(--ink);
+  max-width:430px;margin:0 auto;
+  min-height:100vh;overflow-x:hidden;
+  padding-bottom:82px;
+}
+
+/* NAV */
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;
+  background:var(--card);border-top:1.5px solid var(--border);
+  display:flex;z-index:200;
+  padding-bottom:env(safe-area-inset-bottom);
+  box-shadow:0 -4px 24px rgba(28,22,16,.10);
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:10px 0 8px;background:none;border:none;cursor:pointer;
+  font-family:'Outfit',sans-serif;font-size:10px;font-weight:500;
+  color:var(--ink3);transition:color .2s;
+}
+.nav-btn.active{color:var(--terra);}
+.nav-icon{font-size:22px;line-height:1;}
+
+/* PAGES */
+.page{display:none;animation:fadeUp .25s ease;}
+.page.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* HEADER */
+.page-header{
+  background:var(--card);padding:52px 20px 16px;
+  position:sticky;top:0;z-index:100;
+  border-bottom:1.5px solid var(--border);box-shadow:var(--sh);
+}
+.page-header h1{
+  font-family:'Playfair Display',serif;font-size:24px;font-weight:700;
+  color:var(--ink);letter-spacing:-.3px;
+}
+.page-header h1 em{font-style:italic;color:var(--terra);}
+.page-header p{font-size:12.5px;color:var(--ink2);margin-top:2px;font-weight:300;}
+
+/* CARD */
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;}
+.px16{padding:0 16px;}
+.mt8{margin-top:8px;}
+.mt12{margin-top:12px;}
+.mt16{margin-top:16px;}
+.gap16{padding:16px 16px 0;}
+
+.card-head{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px 12px;cursor:pointer;user-select:none;
+}
+.card-icon{
+  width:42px;height:42px;border-radius:13px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.card-meta{flex:1;min-width:0;}
+.card-meta .cname{font-size:15px;font-weight:600;}
+.card-meta .cprog{font-size:11.5px;color:var(--ink3);margin-top:1px;}
+.mini-bar{height:5px;background:var(--border);border-radius:99px;margin-top:5px;overflow:hidden;}
+.mini-fill{height:100%;border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1);}
+.chevron{font-size:12px;color:var(--ink3);transition:transform .22s;flex-shrink:0;}
+.chevron.open{transform:rotate(180deg);}
+.card-body{display:none;padding:0 16px 14px;}
+.card-body.open{display:block;}
+.del-card-row{padding:0 16px 12px;}
+.btn-del-card{
+  background:none;border:1.5px solid #EAC8BE;color:#C05030;
+  border-radius:var(--rss);font-size:12.5px;font-weight:500;
+  font-family:'Outfit',sans-serif;padding:7px 14px;cursor:pointer;
+  transition:background .2s;
+}
+.btn-del-card:active{background:#FDE8E0;}
+
+/* CHECKLIST */
+.chk-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;
+}
+.chk-item:last-of-type{border-bottom:none;}
+.chk-item.done .chk-label{text-decoration:line-through;color:var(--ink3);}
+.chk-box{
+  width:24px;height:24px;border-radius:8px;
+  border:2px solid var(--border2);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .18s;margin-top:1px;
+}
+.chk-item.done .chk-box{border-color:var(--sage);background:var(--sage);}
+.chk-box svg{display:none;}
+.chk-item.done .chk-box svg{display:block;}
+.chk-label{font-size:14px;line-height:1.4;flex:1;}
+.chk-date-line{font-size:11px;color:var(--ink3);margin-top:2px;}
+.chk-date-line.urgent{color:var(--terra);font-weight:600;}
+.chk-date-line.soon{color:var(--gold);font-weight:500;}
+.chk-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.btn-icon{background:none;border:none;cursor:pointer;font-size:17px;opacity:.4;transition:opacity .2s;padding:0;}
+.btn-icon:hover{opacity:.85;}
+
+/* ADD ROW */
+.add-row{display:flex;gap:8px;margin-top:10px;}
+.add-input{
+  flex:1;background:var(--bg);border:1.5px solid var(--border2);
+  border-radius:var(--rss);padding:10px 13px;
+  font-size:13.5px;font-family:'Outfit',sans-serif;color:var(--ink);
+  outline:none;transition:border-color .2s;
+}
+.add-input:focus{border-color:var(--terra);}
+.add-btn{
+  background:var(--terra);color:#fff;border:none;
+  border-radius:var(--rss);padding:10px 16px;font-size:22px;
+  cursor:pointer;font-family:'Outfit',sans-serif;
+  transition:background .2s;flex-shrink:0;
+  display:flex;align-items:center;
+}
+.add-btn:active{background:#A04418;}
+
+/* SECTION LABEL */
+.sec-label{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 16px 8px;
+}
+.sec-label h2{
+  font-family:'Playfair Display',serif;
+  font-size:19px;font-weight:700;font-style:italic;
+}
+.sec-badge{
+  background:var(--ink);color:#fff;
+  font-size:11px;font-weight:600;
+  padding:3px 10px;border-radius:99px;
+}
+.add-section-btn{
+  background:var(--terra-pale);color:var(--terra);
+  border:1.5px dashed var(--terra-l);border-radius:var(--rs);
+  font-family:'Outfit',sans-serif;font-size:13.5px;font-weight:600;
+  padding:12px;width:100%;cursor:pointer;transition:background .2s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.add-section-btn:active{background:#F4DECE;}
+
+/* TABS */
+.tabs{display:flex;gap:8px;padding:14px 16px 0;overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab-btn{
+  flex-shrink:0;padding:8px 18px;border-radius:99px;
+  font-size:13px;font-weight:600;font-family:'Outfit',sans-serif;
+  border:2px solid var(--border2);background:transparent;
+  color:var(--ink2);cursor:pointer;transition:all .2s;
+}
+.tab-btn.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+
+/* OVERALL */
+.overall-card{
+  background:var(--ink);color:#fff;border-radius:var(--r);
+  padding:20px;margin:16px 16px 0;position:relative;overflow:hidden;
+}
+.overall-card::before{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.04);
+}
+.ov-label{font-size:10.5px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;opacity:.5;margin-bottom:6px;}
+.ov-num{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;line-height:1;}
+.ov-num span{font-size:16px;font-family:'Outfit',sans-serif;font-weight:300;opacity:.5;}
+.ov-sub{font-size:12px;opacity:.45;margin-top:3px;}
+.ov-bar-wrap{margin-top:13px;background:rgba(255,255,255,.12);border-radius:99px;height:7px;overflow:hidden;}
+.ov-bar-fill{height:100%;border-radius:99px;background:var(--terra-l);transition:width .6s cubic-bezier(.4,0,.2,1);}
+
+/* COUNTDOWN */
+.countdown-hero{
+  background:linear-gradient(135deg,var(--terra) 0%,#A03818 100%);
+  border-radius:var(--r);margin:16px 16px 0;
+  padding:20px;color:#fff;
+  box-shadow:0 6px 24px rgba(201,92,40,.28);
+  position:relative;overflow:hidden;
+}
+.countdown-hero::before{
+  content:'📦';position:absolute;right:-10px;top:-10px;
+  font-size:90px;opacity:.1;pointer-events:none;
+}
+.cd-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.cd-label{font-size:10.5px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;opacity:.65;}
+.cd-edit-btn{
+  background:rgba(255,255,255,.18);border:none;color:#fff;
+  border-radius:8px;padding:5px 12px;font-size:12px;
+  font-family:'Outfit',sans-serif;cursor:pointer;
+}
+.cd-days{
+  font-family:'Playfair Display',serif;font-size:52px;
+  font-weight:700;line-height:1;margin:6px 0 2px;
+}
+.cd-days span{font-size:18px;font-family:'Outfit',sans-serif;font-weight:300;opacity:.7;}
+.cd-date{font-size:13px;opacity:.6;}
+.cd-blocks{display:flex;gap:8px;margin-top:14px;}
+.cd-block{
+  flex:1;background:rgba(255,255,255,.13);
+  border-radius:10px;padding:10px 8px;text-align:center;
+}
+.cd-block .n{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;line-height:1;}
+.cd-block .u{font-size:10px;opacity:.6;margin-top:2px;}
+
+/* DASH */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 0;}
+.stat-card{background:var(--card);border-radius:var(--rs);padding:15px 14px;box-shadow:var(--sh);}
+.stat-card .st-icon{font-size:22px;margin-bottom:6px;}
+.stat-card .st-num{
+  font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--ink);line-height:1;
+}
+.stat-card .st-label{font-size:11.5px;color:var(--ink3);margin-top:3px;}
+
+.chart-card{
+  background:var(--card);border-radius:var(--r);
+  padding:18px 16px;margin:12px 16px 0;box-shadow:var(--sh);
+}
+.chart-title{font-size:11px;font-weight:600;color:var(--ink3);margin-bottom:14px;letter-spacing:1px;text-transform:uppercase;}
+
+.donut-wrap{display:flex;align-items:center;gap:18px;}
+.donut-legend{display:flex;flex-direction:column;gap:9px;flex:1;}
+.legend-item{display:flex;align-items:center;gap:8px;}
+.legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.legend-label{font-size:11.5px;color:var(--ink2);flex:1;line-height:1.3;}
+.legend-val{font-size:12px;font-weight:700;color:var(--ink);}
+
+.bar-chart-wrap{overflow-x:auto;padding-bottom:4px;}
+.bar-chart-wrap::-webkit-scrollbar{height:3px;}
+.bar-chart-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+
+/* TAG */
+.tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;margin-top:3px;}
+.tag-urgent{background:#FDEAE0;color:var(--terra);}
+.tag-soon{background:var(--gold-pale);color:var(--gold);}
+.tag-ok{background:var(--sage-pale);color:var(--sage);}
+
+/* UPCOMING */
+.event-item{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);}
+.event-item:last-child{border-bottom:none;}
+.event-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.event-info{flex:1;}
+.event-name{font-size:14px;font-weight:500;}
+.event-meta{font-size:11.5px;color:var(--ink3);margin-top:1px;}
+.event-del{background:none;border:none;font-size:16px;color:var(--ink3);cursor:pointer;opacity:.5;padding:0;}
+.event-del:hover{opacity:1;color:var(--terra);}
+
+/* CALENDAR */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.cal-nav h3{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;}
+.cal-nav-btn{
+  background:var(--bg);border:1.5px solid var(--border2);
+  border-radius:99px;width:32px;height:32px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;cursor:pointer;color:var(--ink2);
+}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-dh{text-align:center;font-size:10.5px;font-weight:600;color:var(--ink3);padding:4px 0 8px;}
+.cal-day{
+  aspect-ratio:1;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;cursor:pointer;position:relative;
+  transition:background .15s;
+}
+.cal-day:hover:not(.empty):not(.today){background:var(--border);}
+.cal-day.today{background:var(--ink);color:#fff;font-weight:700;}
+.cal-day.has-tasks::after{
+  content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);
+  width:4px;height:4px;border-radius:50%;background:var(--terra);
+}
+.cal-day.today.has-tasks::after{background:var(--terra-l);}
+.cal-day.move-day{background:var(--terra-pale);border:2px solid var(--terra);color:var(--terra);font-weight:700;}
+.cal-day.empty{cursor:default;}
+
+/* ADD EVENT FORM */
+.add-event-form{
+  background:var(--card2);border-radius:var(--rs);
+  border:1.5px solid var(--border);
+  padding:16px;margin-top:12px;
+}
+.add-event-form h4{font-size:13px;font-weight:700;margin-bottom:12px;color:var(--ink2);}
+.form-row{margin-bottom:10px;}
+.form-label{font-size:11.5px;color:var(--ink3);font-weight:500;margin-bottom:4px;display:block;}
+.form-input{
+  width:100%;background:var(--bg);border:1.5px solid var(--border2);
+  border-radius:var(--rss);padding:9px 12px;
+  font-size:13.5px;font-family:'Outfit',sans-serif;color:var(--ink);
+  outline:none;transition:border-color .2s;
+}
+.form-input:focus{border-color:var(--terra);}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.color-pick{display:flex;gap:8px;flex-wrap:wrap;}
+.color-opt{
+  width:26px;height:26px;border-radius:8px;cursor:pointer;
+  border:3px solid transparent;transition:border-color .15s;
+}
+.color-opt.sel{border-color:var(--ink);}
+.save-event-btn{
+  width:100%;background:var(--terra);color:#fff;border:none;
+  border-radius:var(--rss);padding:12px;
+  font-size:14px;font-weight:600;font-family:'Outfit',sans-serif;
+  cursor:pointer;transition:background .2s;margin-top:2px;
+}
+.save-event-btn:active{background:#A04418;}
+
+/* MODAL */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(28,22,16,.45);
+  z-index:500;display:flex;align-items:flex-end;
+  animation:fadeIn .2s ease;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-sheet{
+  width:100%;max-width:430px;margin:0 auto;
+  background:var(--card);border-radius:24px 24px 0 0;
+  padding:20px 20px 40px;animation:slideUp .25s ease;
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;}
+.modal-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:14px;}
+.modal-actions{display:flex;gap:10px;margin-top:14px;}
+.modal-cancel{
+  flex:1;background:var(--bg);border:1.5px solid var(--border2);
+  border-radius:var(--rss);padding:12px;font-size:14px;
+  font-family:'Outfit',sans-serif;cursor:pointer;
+}
+.modal-confirm{
+  flex:1;background:var(--terra);color:#fff;border:none;
+  border-radius:var(--rss);padding:12px;font-size:14px;font-weight:600;
+  font-family:'Outfit',sans-serif;cursor:pointer;
+}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:28px 16px;color:var(--ink3);}
+.empty-state .e-icon{font-size:36px;margin-bottom:8px;}
+.empty-state p{font-size:13px;line-height:1.5;}
+
+/* ICON PICKER */
+.icon-picker-grid{display:flex;flex-wrap:wrap;gap:6px;}
+.icon-opt{
+  font-size:24px;background:var(--bg);border:2.5px solid transparent;
+  border-radius:10px;padding:6px 8px;cursor:pointer;transition:border-color .15s;
+}
+.icon-opt.sel{border-color:var(--terra);}
+
+/* color tokens */
+.ic-terra{background:var(--terra-pale);}   .fill-terra{background:var(--terra);}
+.ic-sage{background:var(--sage-pale);}     .fill-sage{background:var(--sage);}
+.ic-gold{background:var(--gold-pale);}     .fill-gold{background:var(--gold-l);}
+.ic-sky{background:var(--sky-pale);}       .fill-sky{background:var(--sky);}
+.ic-plum{background:var(--plum-pale);}     .fill-plum{background:var(--plum);}
+</style>
+</head>
+<body>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="showPage('dash')" id="nav-dash">
+    <span class="nav-icon">📊</span>Dashboard
+  </button>
+  <button class="nav-btn" onclick="showPage('tasks')" id="nav-tasks">
+    <span class="nav-icon">✅</span>Tarefas
+  </button>
+  <button class="nav-btn" onclick="showPage('cal')" id="nav-cal">
+    <span class="nav-icon">📅</span>Calendário
+  </button>
+</nav>
+
+<!-- PAGE: DASHBOARD -->
+<div class="page active" id="page-dash">
+  <div class="page-header">
+    <h1>Mudança<em>Fácil</em></h1>
+    <p id="dash-sub">Painel geral da sua mudança ✦</p>
+  </div>
+  <div id="dash-countdown"></div>
+  <div class="dash-grid" id="dash-stats"></div>
+  <div class="chart-card mt12" id="dash-donut"></div>
+  <div class="chart-card mt12" id="dash-bar"></div>
+  <div class="chart-card mt12" id="dash-upcoming"></div>
+  <div style="height:16px"></div>
+</div>
+
+<!-- PAGE: TAREFAS -->
+<div class="page" id="page-tasks">
+  <div class="page-header">
+    <h1>Tarefas</h1>
+    <p>Organize por seção e cômodo</p>
+  </div>
+  <div id="task-overall"></div>
+  <div class="tabs" id="task-tabs"></div>
+  <div id="task-content"></div>
+</div>
+
+<!-- PAGE: CALENDÁRIO -->
+<div class="page" id="page-cal">
+  <div class="page-header">
+    <h1>Calendário</h1>
+    <p>Prazos e datas da mudança</p>
+  </div>
+  <div class="gap16">
+    <div class="card">
+      <div style="padding:16px">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="calShift(-1)">‹</button>
+          <h3 id="cal-month-lbl"></h3>
+          <button class="cal-nav-btn" onclick="calShift(1)">›</button>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+    </div>
+    <div class="card mt12">
+      <div style="padding:16px">
+        <div class="chart-title" id="cal-ev-title">EVENTOS DO MÊS</div>
+        <div id="cal-ev-list"></div>
+      </div>
+    </div>
+    <div class="add-event-form">
+      <h4>＋ Adicionar evento / prazo</h4>
+      <div class="form-row">
+        <label class="form-label">Título</label>
+        <input class="form-input" id="ev-title" placeholder="Ex: Contratar empresa de mudança">
+      </div>
+      <div class="form-row-2">
+        <div>
+          <label class="form-label">Data</label>
+          <input class="form-input" type="date" id="ev-date">
+        </div>
+        <div>
+          <label class="form-label">Seção</label>
+          <select class="form-input" id="ev-section">
+            <option value="casa_atual">Casa Atual</option>
+            <option value="casa_nova">Casa Nova</option>
+            <option value="geral">Geral</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Cor</label>
+        <div class="color-pick" id="ev-color-pick">
+          <div class="color-opt sel" style="background:#C95C28" data-c="#C95C28" onclick="pickEvColor(this)"></div>
+          <div class="color-opt" style="background:#3E8060" data-c="#3E8060" onclick="pickEvColor(this)"></div>
+          <div class="color-opt" style="background:#B8860B" data-c="#B8860B" onclick="pickEvColor(this)"></div>
+          <div class="color-opt" style="background:#2E6EA0" data-c="#2E6EA0" onclick="pickEvColor(this)"></div>
+          <div class="color-opt" style="background:#7040A0" data-c="#7040A0" onclick="pickEvColor(this)"></div>
+        </div>
+      </div>
+      <button class="save-event-btn" onclick="saveEvent()">Salvar evento</button>
+    </div>
+    <div style="height:16px"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" style="display:none" onclick="closeModal(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ──────────────────────────────────────────
+//  DEFAULT DATA
+// ──────────────────────────────────────────
+const ROOM_ICONS = ['🛋️','🛏️','🍳','🚿','💼','🧺','🚗','🌿','📦','🪑','🎮','📚','🧸','🏋️','🎨','🎵'];
+const ROOM_COLORS = ['sage','sky','gold','terra','plum'];
+
+const DEFAULT = {
+  moveDate: null,
+  activeSec: 'casa_atual',
+  openCards: {},
+  calY: new Date().getFullYear(),
+  calM: new Date().getMonth(),
+  evColor: '#C95C28',
+  events: [],
+  sections: {
+    casa_atual: {
+      label:'🏠 Casa Atual',
+      services:{
+        id:'svc_ca', icon:'⚡', label:'Serviços & Transferências', color:'terra',
+        tasks:[
+          {id:'sa1',l:'Cancelar/transferir contrato de energia elétrica',done:false,date:null},
+          {id:'sa2',l:'Transferir titularidade da água',done:false,date:null},
+          {id:'sa3',l:'Cancelar/portar plano de internet',done:false,date:null},
+          {id:'sa4',l:'Cancelar TV a cabo',done:false,date:null},
+          {id:'sa5',l:'Cancelar ou avisar empresa de gás',done:false,date:null},
+          {id:'sa6',l:'Notificar banco sobre novo endereço',done:false,date:null},
+          {id:'sa7',l:'Atualizar cadastro nos Correios',done:false,date:null},
+          {id:'sa8',l:'Avisar empregador sobre mudança',done:false,date:null},
+        ]
+      },
+      rooms:[
+        {id:'ra1',icon:'🛋️',label:'Sala de Estar',color:'sage',tasks:[
+          {id:'t1',l:'Desmontar estante / rack',done:false,date:null},
+          {id:'t2',l:'Embalar almofadas e decorações',done:false,date:null},
+          {id:'t3',l:'Fotografar paredes antes de retirar quadros',done:false,date:null},
+          {id:'t4',l:'Etiquetar caixas por destino',done:false,date:null},
+        ]},
+        {id:'ra2',icon:'🛏️',label:'Quarto',color:'sky',tasks:[
+          {id:'t5',l:'Desmontar cama e guardar parafusos',done:false,date:null},
+          {id:'t6',l:'Esvaziar e embalar guarda-roupa',done:false,date:null},
+          {id:'t7',l:'Embalar espelhos com plástico bolha',done:false,date:null},
+        ]},
+        {id:'ra3',icon:'🍳',label:'Cozinha',color:'gold',tasks:[
+          {id:'t8',l:'Usar ou descartar alimentos perecíveis',done:false,date:null},
+          {id:'t9',l:'Embalar louças e panelas',done:false,date:null},
+          {id:'t10',l:'Limpar e desgelar geladeira',done:false,date:null},
+          {id:'t11',l:'Embalar eletrodomésticos pequenos',done:false,date:null},
+        ]},
+        {id:'ra4',icon:'🚿',label:'Banheiro',color:'terra',tasks:[
+          {id:'t12',l:'Recolher higiene pessoal e medicamentos',done:false,date:null},
+          {id:'t13',l:'Remover toalhas, tapetes e cortinas',done:false,date:null},
+        ]},
+        {id:'ra5',icon:'💼',label:'Escritório',color:'plum',tasks:[
+          {id:'t14',l:'Fazer backup dos arquivos importantes',done:false,date:null},
+          {id:'t15',l:'Desmontar PC e etiquetar cabos',done:false,date:null},
+          {id:'t16',l:'Embalar documentos em pasta lacrada',done:false,date:null},
+        ]},
+      ]
+    },
+    casa_nova:{
+      label:'🏡 Casa Nova',
+      services:{
+        id:'svc_cn', icon:'🔌', label:'Serviços & Instalações', color:'sage',
+        tasks:[
+          {id:'sb1',l:'Ligar energia no nome do novo morador',done:false,date:null},
+          {id:'sb2',l:'Ligar água no novo endereço',done:false,date:null},
+          {id:'sb3',l:'Agendar instalação de internet',done:false,date:null},
+          {id:'sb4',l:'Verificar instalação do gás',done:false,date:null},
+          {id:'sb5',l:'Testar tomadas e disjuntores',done:false,date:null},
+          {id:'sb6',l:'Atualizar endereço na Receita Federal / Detran',done:false,date:null},
+          {id:'sb7',l:'Trocar fechaduras da nova casa',done:false,date:null},
+          {id:'sb8',l:'Contratar seguro residencial',done:false,date:null},
+        ]
+      },
+      rooms:[
+        {id:'rb1',icon:'🛋️',label:'Sala de Estar',color:'sage',tasks:[
+          {id:'t17',l:'Limpar antes de montar móveis',done:false,date:null},
+          {id:'t18',l:'Montar rack e posicionar sofá',done:false,date:null},
+          {id:'t19',l:'Pendurar quadros e decorar',done:false,date:null},
+        ]},
+        {id:'rb2',icon:'🛏️',label:'Quarto',color:'sky',tasks:[
+          {id:'t20',l:'Montar cama e organizar guarda-roupa',done:false,date:null},
+          {id:'t21',l:'Fixar espelhos na parede',done:false,date:null},
+          {id:'t22',l:'Colocar tapete, abajur e decoração',done:false,date:null},
+        ]},
+        {id:'rb3',icon:'🍳',label:'Cozinha',color:'gold',tasks:[
+          {id:'t23',l:'Limpar armários e organizar louças',done:false,date:null},
+          {id:'t24',l:'Instalar geladeira (aguardar 2h para ligar)',done:false,date:null},
+          {id:'t25',l:'Verificar fogão e torneiras',done:false,date:null},
+        ]},
+        {id:'rb4',icon:'🚿',label:'Banheiro',color:'terra',tasks:[
+          {id:'t26',l:'Limpeza profunda antes de usar',done:false,date:null},
+          {id:'t27',l:'Instalar prateleiras e espelho',done:false,date:null},
+        ]},
+        {id:'rb5',icon:'🌿',label:'Varanda',color:'plum',tasks:[
+          {id:'t28',l:'Limpar e organizar espaço externo',done:false,date:null},
+          {id:'t29',l:'Instalar vasos de plantas',done:false,date:null},
+        ]},
+      ]
+    }
+  }
+};
+
+// ──────────────────────────────────────────
+//  STATE PERSISTENCE
+// ──────────────────────────────────────────
+const SK = 'mudanca_v4';
+let S;
+
+function deepMerge(def, saved) {
+  // merge task done/date/custom into def
+  ['casa_atual','casa_nova'].forEach(sec => {
+    if (!saved.sections?.[sec]) return;
+    const ds = def.sections[sec];
+    const ss = saved.sections[sec];
+    // service tasks
+    if (ss.services) {
+      ds.services.label = ss.services.label ?? ds.services.label;
+      ss.services.tasks?.forEach(st => {
+        const dt = ds.services.tasks.find(t => t.id === st.id);
+        if (dt) { dt.done = st.done; dt.date = st.date ?? null; }
+        else if (st.custom) ds.services.tasks.push(st);
+      });
+    }
+    // rooms
+    ss.rooms?.forEach(sr => {
+      const dr = ds.rooms.find(r => r.id === sr.id);
+      if (dr) {
+        sr.tasks?.forEach(st => {
+          const dt = dr.tasks.find(t => t.id === st.id);
+          if (dt) { dt.done = st.done; dt.date = st.date ?? null; }
+          else if (st.custom) dr.tasks.push(st);
+        });
+      } else if (sr.custom) {
+        ds.rooms.push(sr);
+      }
+    });
+  });
+  def.moveDate = saved.moveDate ?? null;
+  def.events = saved.events ?? [];
+  def.activeSec = saved.activeSec ?? 'casa_atual';
+  def.openCards = saved.openCards ?? {};
+  def.calY = saved.calY ?? def.calY;
+  def.calM = saved.calM ?? def.calM;
+  def.evColor = saved.evColor ?? def.evColor;
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(SK);
+    if (raw) deepMerge(DEFAULT, JSON.parse(raw));
+  } catch(e) {}
+  return DEFAULT;
+}
+
+function persist() {
+  const snap = {
+    moveDate: S.moveDate,
+    events: S.events,
+    activeSec: S.activeSec,
+    openCards: S.openCards,
+    calY: S.calY, calM: S.calM,
+    evColor: S.evColor,
+    sections: {}
+  };
+  ['casa_atual','casa_nova'].forEach(sec => {
+    const section = S.sections[sec];
+    snap.sections[sec] = {
+      services: {
+        label: section.services.label,
+        tasks: section.services.tasks.map(t => ({id:t.id,l:t.l,done:t.done,date:t.date,custom:t.custom}))
+      },
+      rooms: section.rooms.map(r => ({
+        id:r.id, icon:r.icon, label:r.label, color:r.color, custom:r.custom,
+        tasks: r.tasks.map(t => ({id:t.id,l:t.l,done:t.done,date:t.date,custom:t.custom}))
+      }))
+    };
+  });
+  localStorage.setItem(SK, JSON.stringify(snap));
+}
+
+// ──────────────────────────────────────────
+//  HELPERS
+// ──────────────────────────────────────────
+function uid(){ return 'u'+Date.now()+Math.random().toString(36).slice(2,6); }
+function prog(tasks){ const d=tasks.filter(t=>t.done).length, n=tasks.length; return {d,n,pct:n?Math.round(d/n*100):0}; }
+function allTasks(){
+  const all=[];
+  ['casa_atual','casa_nova'].forEach(sec=>{
+    const s=S.sections[sec];
+    s.services.tasks.forEach(t=>all.push({...t,sec,grp:s.services.label}));
+    s.rooms.forEach(r=>r.tasks.forEach(t=>all.push({...t,sec,grp:r.label})));
+  });
+  return all;
+}
+function daysUntil(ds){
+  if(!ds) return null;
+  const n=new Date(); n.setHours(0,0,0,0);
+  return Math.ceil((new Date(ds+'T00:00:00')-n)/86400000);
+}
+function fmtDate(ds){
+  if(!ds) return '';
+  return new Date(ds+'T00:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+}
+function urgTag(days){
+  if(days===null) return '';
+  if(days<0) return '<span class="tag tag-urgent">Atrasado</span>';
+  if(days===0) return '<span class="tag tag-urgent">Hoje!</span>';
+  if(days<=3) return `<span class="tag tag-urgent">${days}d</span>`;
+  if(days<=7) return `<span class="tag tag-soon">${days} dias</span>`;
+  return `<span class="tag tag-ok">${days} dias</span>`;
+}
+function getTask(sec, gid, tid){
+  const section=S.sections[sec];
+  if(gid.startsWith('svc_')) return section.services.tasks.find(t=>t.id===tid);
+  return section.rooms.find(r=>r.id===gid)?.tasks.find(t=>t.id===tid);
+}
+
+// ──────────────────────────────────────────
+//  NAVIGATION
+// ──────────────────────────────────────────
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+  if(id==='dash') renderDash();
+  if(id==='tasks') renderTasks();
+  if(id==='cal') renderCal();
+}
+
+// ──────────────────────────────────────────
+//  DASHBOARD
+// ──────────────────────────────────────────
+function renderDash(){
+  renderCountdown();
+  renderDashStats();
+  renderDonut();
+  renderBar();
+  renderUpcoming();
+}
+
+function renderCountdown(){
+  const md=S.moveDate, days=md?daysUntil(md):null;
+  let blocksHTML='';
+  let subtitle='Painel geral da sua mudança ✦';
+  if(days!==null){
+    if(days>0){
+      const w=Math.floor(days/7),r=days%7;
+      blocksHTML=`<div class="cd-block"><div class="n">${w}</div><div class="u">semanas</div></div>
+        <div class="cd-block"><div class="n">${r}</div><div class="u">dias rest.</div></div>
+        <div class="cd-block"><div class="n">${days}</div><div class="u">dias total</div></div>`;
+      subtitle=`${days} dias para a mudança! ✦`;
+    } else if(days===0){
+      blocksHTML=`<div class="cd-block" style="flex:1"><div class="n">🎉</div><div class="u">É HOJE!</div></div>`;
+      subtitle='Dia da mudança chegou! 🎉';
+    } else {
+      blocksHTML=`<div class="cd-block" style="flex:1"><div class="n">✅</div><div class="u">Concluída</div></div>`;
+      subtitle='Mudança concluída! ✅';
+    }
+  }
+  document.getElementById('dash-sub').textContent=subtitle;
+  document.getElementById('dash-countdown').innerHTML=`
+    <div class="countdown-hero">
+      <div class="cd-top">
+        <div class="cd-label">Dia da mudança</div>
+        <button class="cd-edit-btn" onclick="openMoveDate()">✏️ Editar</button>
+      </div>
+      <div class="cd-days">${days!==null?Math.max(0,days):'--'}<span> dias</span></div>
+      <div class="cd-date">${md?fmtDate(md):'Defina a data da mudança'}</div>
+      ${blocksHTML?`<div class="cd-blocks">${blocksHTML}</div>`:''}
+    </div>`;
+}
+
+function renderDashStats(){
+  const all=allTasks();
+  const rooms=S.sections.casa_atual.rooms.length+S.sections.casa_nova.rooms.length;
+  document.getElementById('dash-stats').innerHTML=`
+    <div class="stat-card"><div class="st-icon">📦</div><div class="st-num">${all.length}</div><div class="st-label">Total tarefas</div></div>
+    <div class="stat-card"><div class="st-icon">✅</div><div class="st-num">${all.filter(t=>t.done).length}</div><div class="st-label">Concluídas</div></div>
+    <div class="stat-card"><div class="st-icon">⏳</div><div class="st-num">${all.filter(t=>!t.done).length}</div><div class="st-label">Pendentes</div></div>
+    <div class="stat-card"><div class="st-icon">🏠</div><div class="st-num">${rooms}</div><div class="st-label">Cômodos</div></div>`;
+}
+
+function renderDonut(){
+  const el=document.getElementById('dash-donut');
+  const segs=[
+    {name:'Casa Atual – Serviços', color:'#C95C28', tasks:S.sections.casa_atual.services.tasks},
+    {name:'Casa Atual – Cômodos',  color:'#3E8060', tasks:S.sections.casa_atual.rooms.flatMap(r=>r.tasks)},
+    {name:'Casa Nova – Serviços',  color:'#2E6EA0', tasks:S.sections.casa_nova.services.tasks},
+    {name:'Casa Nova – Cômodos',   color:'#7040A0', tasks:S.sections.casa_nova.rooms.flatMap(r=>r.tasks)},
+  ].map(s=>({...s,...prog(s.tasks)}));
+  const total=segs.reduce((a,s)=>a+s.n,0);
+  const done=segs.reduce((a,s)=>a+s.d,0);
+  const overallPct=total?Math.round(done/total*100):0;
+  const cx=55,cy=55,r=36,sw=18,circ=2*Math.PI*r;
+  let offset=0, paths='';
+  segs.forEach(s=>{
+    const slice=(s.n/(total||1))*circ;
+    const filled=slice*(s.pct/100);
+    paths+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.color}22" stroke-width="${sw}" stroke-dasharray="${slice} ${circ}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})"/>`;
+    if(filled>0) paths+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.color}" stroke-width="${sw}" stroke-dasharray="${filled} ${circ}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})" stroke-linecap="round"/>`;
+    offset+=slice;
+  });
+  el.innerHTML=`
+    <div class="chart-title">PROGRESSO POR SEÇÃO</div>
+    <div class="donut-wrap">
+      <svg width="110" height="110" viewBox="0 0 110 110">
+        ${paths}
+        <text x="${cx}" y="${cy-5}" text-anchor="middle" font-family="Playfair Display,serif" font-size="16" font-weight="700" fill="#1C1610">${overallPct}%</text>
+        <text x="${cx}" y="${cy+10}" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" fill="#B0A090">GERAL</text>
+      </svg>
+      <div class="donut-legend">${segs.map(s=>`
+        <div class="legend-item">
+          <div class="legend-dot" style="background:${s.color}"></div>
+          <div class="legend-label">${s.name.split('–')[1].trim()}<br><span style="font-size:10px;opacity:.6">${s.name.split('–')[0].trim()}</span></div>
+          <div class="legend-val">${s.pct}%</div>
+        </div>`).join('')}</div>
+    </div>`;
+}
+
+function renderBar(){
+  const el=document.getElementById('dash-bar');
+  const rooms=[...S.sections.casa_atual.rooms,...S.sections.casa_nova.rooms];
+  if(!rooms.length){el.innerHTML='<div class="chart-title">TAREFAS POR CÔMODO</div><div class="empty-state"><div class="e-icon">🏠</div><p>Nenhum cômodo</p></div>';return;}
+  const bW=34,gap=10,padL=8,padB=28,padT=10,H=130,chartH=H-padB-padT;
+  const maxT=Math.max(...rooms.map(r=>r.tasks.length),1);
+  const W=Math.max(rooms.length*(bW+gap)+padL,300);
+  const clrs=['#3E8060','#2E6EA0','#B8860B','#C95C28','#7040A0'];
+  let bars='',lbls='';
+  rooms.forEach((room,i)=>{
+    const p=prog(room.tasks);
+    const x=padL+i*(bW+gap);
+    const tH=(room.tasks.length/maxT)*chartH;
+    const dH=(p.d/maxT)*chartH;
+    const yT=padT+chartH-tH, yD=padT+chartH-dH;
+    const c=clrs[i%clrs.length];
+    bars+=`<rect x="${x}" y="${yT}" width="${bW}" height="${tH}" rx="6" fill="${c}22"/>`;
+    if(dH>0) bars+=`<rect x="${x}" y="${yD}" width="${bW}" height="${dH}" rx="6" fill="${c}"/>`;
+    const abbr=room.label.length>5?room.label.slice(0,5)+'…':room.label;
+    lbls+=`<text x="${x+bW/2}" y="${H-6}" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" fill="#B0A090">${abbr}</text>`;
+    if(room.tasks.length) lbls+=`<text x="${x+bW/2}" y="${yT-3}" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" font-weight="600" fill="#6B5E52">${p.pct}%</text>`;
+  });
+  el.innerHTML=`<div class="chart-title">TAREFAS POR CÔMODO</div>
+    <div class="bar-chart-wrap"><svg width="${W}" height="${H}" style="display:block">${bars}${lbls}</svg></div>`;
+}
+
+function renderUpcoming(){
+  const el=document.getElementById('dash-upcoming');
+  const items=allTasks().filter(t=>t.date&&!t.done).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,5);
+  let content=items.length?items.map(t=>{
+    const d=daysUntil(t.date);
+    const c=d!==null&&d<=3?'#C95C28':d!==null&&d<=7?'#B8860B':'#3E8060';
+    return `<div class="event-item">
+      <div class="event-dot" style="background:${c}"></div>
+      <div class="event-info">
+        <div class="event-name">${t.l}</div>
+        <div class="event-meta">${t.grp} · ${fmtDate(t.date)}</div>
+        ${urgTag(d)}
+      </div>
+    </div>`;
+  }).join(''):`<div class="empty-state"><div class="e-icon">📅</div><p>Nenhuma tarefa com data.<br>Toque em 📅 em qualquer tarefa!</p></div>`;
+  el.innerHTML=`<div class="chart-title">PRÓXIMAS TAREFAS COM PRAZO</div>${content}`;
+}
+
+// ──────────────────────────────────────────
+//  TASKS PAGE
+// ──────────────────────────────────────────
+function renderTasks(){
+  // Overall
+  const sec=S.sections[S.activeSec];
+  const all=[...sec.services.tasks,...sec.rooms.flatMap(r=>r.tasks)];
+  const p=prog(all);
+  document.getElementById('task-overall').innerHTML=`
+    <div class="overall-card">
+      <div class="ov-label">Progresso — ${sec.label}</div>
+      <div class="ov-num">${p.pct}% <span>concluído</span></div>
+      <div class="ov-sub">${p.d} de ${p.n} tarefas</div>
+      <div class="ov-bar-wrap"><div class="ov-bar-fill" style="width:${p.pct}%"></div></div>
+    </div>`;
+  // Tabs
+  document.getElementById('task-tabs').innerHTML=['casa_atual','casa_nova'].map(s=>
+    `<button class="tab-btn ${S.activeSec===s?'active':''}" onclick="switchSec('${s}')">${S.sections[s].label}</button>`
+  ).join('');
+  // Content
+  let html='';
+  // Services
+  html+=cardHTML('svc',`svc_${S.activeSec}`,sec.services.icon,sec.services.label,sec.services.color,sec.services.tasks,S.activeSec,true);
+  // Rooms
+  html+=`<div class="sec-label"><h2>Cômodos</h2><span class="sec-badge">${sec.rooms.length}</span></div>`;
+  sec.rooms.forEach(r=>{ html+=cardHTML('room',r.id,r.icon,r.label,r.color,r.tasks,S.activeSec,false); });
+  html+=`<div class="gap16 mt8"><button class="add-section-btn" onclick="openAddRoom()">＋ Adicionar cômodo</button></div>`;
+  html+=`<div style="height:16px"></div>`;
+  document.getElementById('task-content').innerHTML=html;
+}
+
+function cardHTML(type,id,icon,label,color,tasks,secKey,isSvc){
+  const p=prog(tasks);
+  const open=S.openCards[id];
+  const rows=tasks.map(t=>`
+    <div class="chk-item ${t.done?'done':''}">
+      <div class="chk-box" onclick="toggleTask('${secKey}','${id}','${t.id}')">
+        <svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="flex:1;min-width:0" onclick="toggleTask('${secKey}','${id}','${t.id}')">
+        <div class="chk-label">${t.l}</div>
+        ${t.date?`<div class="chk-date-line ${(d=>d!==null&&d<=3?'urgent':d!==null&&d<=7?'soon':'')(daysUntil(t.date))}">📅 ${fmtDate(t.date)} ${urgTag(daysUntil(t.date))}</div>`:''}
+      </div>
+      <div class="chk-right">
+        <button class="btn-icon" onclick="openDateModal('${secKey}','${id}','${t.id}')" title="Prazo">📅</button>
+        <button class="btn-icon" style="color:var(--terra)" onclick="delTask('${secKey}','${id}','${t.id}')">✕</button>
+      </div>
+    </div>`).join('');
+  return `
+    <div class="gap16">
+      <div class="card">
+        <div class="card-head" onclick="toggleCard('${id}')">
+          <div class="card-icon ic-${color}">${icon}</div>
+          <div class="card-meta">
+            <div class="cname">${label}</div>
+            <div class="cprog">${p.d}/${p.n} · ${p.pct}%</div>
+            <div class="mini-bar"><div class="mini-fill fill-${color}" style="width:${p.pct}%"></div></div>
+          </div>
+          <div class="chevron ${open?'open':''}">▼</div>
+        </div>
+        <div class="card-body ${open?'open':''}">
+          ${rows}
+          <div class="add-row">
+            <input class="add-input" id="inp_${id}" placeholder="Nova tarefa…" onkeydown="if(event.key==='Enter')addTask('${secKey}','${id}')">
+            <button class="add-btn" onclick="addTask('${secKey}','${id}')">+</button>
+          </div>
+        </div>
+        ${!isSvc&&open?`<div class="del-card-row"><button class="btn-del-card" onclick="delRoom('${secKey}','${id}')">🗑 Excluir cômodo</button></div>`:''}
+      </div>
+    </div>`;
+}
+
+function switchSec(s){ S.activeSec=s; persist(); renderTasks(); }
+function toggleCard(id){ S.openCards[id]=!S.openCards[id]; persist(); renderTasks(); }
+
+function toggleTask(secKey,gid,tid){
+  const t=getTask(secKey,gid,tid);
+  if(t){ t.done=!t.done; persist(); renderTasks(); }
+}
+
+function addTask(secKey,gid){
+  const inp=document.getElementById(`inp_${gid}`);
+  if(!inp||!inp.value.trim()) return;
+  const task={id:uid(),l:inp.value.trim(),done:false,date:null,custom:true};
+  const sec=S.sections[secKey];
+  if(gid.startsWith('svc_')) sec.services.tasks.push(task);
+  else sec.rooms.find(r=>r.id===gid)?.tasks.push(task);
+  S.openCards[gid]=true;
+  persist(); renderTasks();
+}
+
+function delTask(secKey,gid,tid){
+  if(!confirm('Excluir tarefa?')) return;
+  const sec=S.sections[secKey];
+  if(gid.startsWith('svc_')) sec.services.tasks=sec.services.tasks.filter(t=>t.id!==tid);
+  else { const r=sec.rooms.find(r=>r.id===gid); if(r) r.tasks=r.tasks.filter(t=>t.id!==tid); }
+  persist(); renderTasks();
+}
+
+function delRoom(secKey,rid){
+  if(!confirm('Excluir este cômodo e todas as suas tarefas?')) return;
+  S.sections[secKey].rooms=S.sections[secKey].rooms.filter(r=>r.id!==rid);
+  persist(); renderTasks();
+}
+
+// ──────────────────────────────────────────
+//  ADD ROOM MODAL
+// ──────────────────────────────────────────
+let _selIcon='📦';
+function openAddRoom(){
+  _selIcon='📦';
+  const iconBtns=ROOM_ICONS.map((ic,i)=>`<button class="icon-opt${ic===_selIcon?' sel':''}" onclick="selIcon('${ic}',this)">${ic}</button>`).join('');
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-title">Novo cômodo</div>
+    <div class="form-row">
+      <label class="form-label">Nome</label>
+      <input class="form-input" id="nr-name" placeholder="Ex: Quarto das crianças">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Ícone</label>
+      <div class="icon-picker-grid">${iconBtns}</div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="modal-confirm" onclick="confirmAddRoom()">Adicionar</button>
+    </div>`;
+  openModal();
+}
+function selIcon(ic,btn){
+  _selIcon=ic;
+  document.querySelectorAll('.icon-opt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+function confirmAddRoom(){
+  const name=document.getElementById('nr-name').value.trim();
+  if(!name){alert('Informe o nome do cômodo');return;}
+  const color=ROOM_COLORS[S.sections[S.activeSec].rooms.length%ROOM_COLORS.length];
+  const room={id:uid(),icon:_selIcon,label:name,color,tasks:[],custom:true};
+  S.sections[S.activeSec].rooms.push(room);
+  S.openCards[room.id]=true;
+  persist(); closeModal(); renderTasks();
+}
+
+// ──────────────────────────────────────────
+//  TASK DATE MODAL
+// ──────────────────────────────────────────
+function openDateModal(secKey,gid,tid){
+  const t=getTask(secKey,gid,tid);
+  if(!t) return;
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-title">📅 Definir prazo</div>
+    <div style="font-size:14px;color:var(--ink2);margin-bottom:14px;line-height:1.4">${t.l}</div>
+    <div class="form-row">
+      <label class="form-label">Data limite</label>
+      <input class="form-input" type="date" id="td-date" value="${t.date||''}">
+    </div>
+    <div class="modal-actions">
+      ${t.date?`<button class="modal-cancel" onclick="setTaskDate('${secKey}','${gid}','${tid}',null)">Remover</button>`:`<button class="modal-cancel" onclick="closeModal()">Cancelar</button>`}
+      <button class="modal-confirm" onclick="setTaskDate('${secKey}','${gid}','${tid}',document.getElementById('td-date').value||null)">Salvar</button>
+    </div>`;
+  openModal();
+}
+function setTaskDate(secKey,gid,tid,date){
+  const t=getTask(secKey,gid,tid);
+  if(t){ t.date=date||null; persist(); }
+  closeModal(); renderTasks();
+  if(document.getElementById('page-dash').classList.contains('active')) renderDash();
+}
+
+// ──────────────────────────────────────────
+//  MOVE DATE MODAL
+// ──────────────────────────────────────────
+function openMoveDate(){
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-title">📦 Data da Mudança</div>
+    <div class="form-row">
+      <label class="form-label">Quando é o dia da mudança?</label>
+      <input class="form-input" type="date" id="md-inp" value="${S.moveDate||''}">
+    </div>
+    <div class="modal-actions">
+      ${S.moveDate?`<button class="modal-cancel" onclick="saveMoveDate(null)">Remover</button>`:`<button class="modal-cancel" onclick="closeModal()">Cancelar</button>`}
+      <button class="modal-confirm" onclick="saveMoveDate(document.getElementById('md-inp').value||null)">Salvar</button>
+    </div>`;
+  openModal();
+}
+function saveMoveDate(v){ S.moveDate=v; persist(); closeModal(); renderDash(); renderCal(); }
+
+// ──────────────────────────────────────────
+//  CALENDAR
+// ──────────────────────────────────────────
+function renderCal(){
+  const y=S.calY, m=S.calM;
+  const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('cal-month-lbl').textContent=`${MONTHS[m]} ${y}`;
+
+  const today=new Date(); today.setHours(0,0,0,0);
+  const firstDay=new Date(y,m,1).getDay();
+  const daysInMonth=new Date(y,m+1,0).getDate();
+
+  // Collect dates with content
+  const markedDates=new Set();
+  allTasks().forEach(t=>{ if(t.date) markedDates.add(t.date); });
+  S.events.forEach(e=>{ if(e.date) markedDates.add(e.date); });
+  if(S.moveDate) markedDates.add(S.moveDate);
+
+  const DAYS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  let html=DAYS.map(d=>`<div class="cal-dh">${d}</div>`).join('');
+  for(let i=0;i<firstDay;i++) html+=`<div class="cal-day empty"></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=new Date(y,m,d).getTime()===today.getTime();
+    const isMD=S.moveDate===ds;
+    const hasMark=markedDates.has(ds)&&!isMD;
+    html+=`<div class="cal-day ${isToday?'today':''} ${hasMark?'has-tasks':''} ${isMD?'move-day':''}" onclick="calDayClick('${ds}')">${d}</div>`;
+  }
+  document.getElementById('cal-grid').innerHTML=html;
+
+  // Events list for month
+  const mStr=`${y}-${String(m+1).padStart(2,'0')}`;
+  const items=[];
+  allTasks().filter(t=>t.date&&t.date.startsWith(mStr)).forEach(t=>items.push({date:t.date,name:t.l,color:'#3E8060',type:'task',done:t.done}));
+  S.events.filter(e=>e.date&&e.date.startsWith(mStr)).forEach(e=>items.push({date:e.date,name:e.title,color:e.color,type:'event',id:e.id}));
+  if(S.moveDate&&S.moveDate.startsWith(mStr)) items.push({date:S.moveDate,name:'📦 DIA DA MUDANÇA',color:'#C95C28',type:'move'});
+  items.sort((a,b)=>a.date.localeCompare(b.date));
+
+  document.getElementById('cal-ev-title').textContent=`EVENTOS DE ${MONTHS[m].toUpperCase()} ${y}`;
+  document.getElementById('cal-ev-list').innerHTML=items.length
+    ? items.map(it=>{
+        const d=daysUntil(it.date);
+        const del=it.type==='event'?`<button class="event-del" onclick="delEvent('${it.id}')">✕</button>`:'';
+        return `<div class="event-item">
+          <div class="event-dot" style="background:${it.color}"></div>
+          <div class="event-info">
+            <div class="event-name">${it.name}${it.done?' ✅':''}</div>
+            <div class="event-meta">${fmtDate(it.date)}</div>
+            ${urgTag(d)}
+          </div>${del}
+        </div>`;
+      }).join('')
+    : `<div class="empty-state"><div class="e-icon">🗓</div><p>Nenhum evento neste mês.</p></div>`;
+}
+
+function calShift(dir){
+  S.calM+=dir;
+  if(S.calM<0){S.calM=11;S.calY--;}
+  if(S.calM>11){S.calM=0;S.calY++;}
+  renderCal();
+}
+
+function calDayClick(ds){
+  document.getElementById('ev-date').value=ds;
+  document.querySelector('.add-event-form').scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('ev-title').focus();
+}
+
+function saveEvent(){
+  const title=document.getElementById('ev-title').value.trim();
+  const date=document.getElementById('ev-date').value;
+  const section=document.getElementById('ev-section').value;
+  if(!title||!date){alert('Informe título e data');return;}
+  S.events.push({id:uid(),title,date,section,color:S.evColor});
+  persist();
+  document.getElementById('ev-title').value='';
+  document.getElementById('ev-date').value='';
+  renderCal();
+}
+
+function delEvent(id){
+  if(!confirm('Excluir evento?')) return;
+  S.events=S.events.filter(e=>e.id!==id);
+  persist(); renderCal();
+}
+
+function pickEvColor(el){
+  document.querySelectorAll('.color-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  S.evColor=el.dataset.c;
+}
+
+// ──────────────────────────────────────────
+//  MODAL
+// ──────────────────────────────────────────
+function openModal(){ document.getElementById('modal-overlay').style.display='flex'; }
+function closeModal(e){
+  if(!e||e.target===document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').style.display='none';
+}
+
+// ──────────────────────────────────────────
+//  BOOT
+// ──────────────────────────────────────────
+S=loadState();
+renderDash();
+
+// ── PWA: register service worker ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(r => console.log('SW registered:', r.scope))
+      .catch(e => console.log('SW error:', e));
+  });
+}
+
+// ── PWA: install prompt banner ──
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!localStorage.getItem('pwa-dismissed')) showInstallBanner();
+});
+
+function showInstallBanner() {
+  const banner = document.createElement('div');
+  banner.id = 'install-banner';
+  banner.style.cssText = `
+    position:fixed;top:0;left:50%;transform:translateX(-50%);
+    width:100%;max-width:430px;
+    background:#1C1610;color:#fff;
+    padding:12px 16px;z-index:999;
+    display:flex;align-items:center;gap:10px;
+    font-family:'Outfit',sans-serif;font-size:13px;
+    box-shadow:0 4px 20px rgba(0,0,0,.3);
+  `;
+  banner.innerHTML = `
+    <span style="font-size:20px">📦</span>
+    <span style="flex:1">Instalar MudançaFácil no celular</span>
+    <button onclick="installPWA()" style="background:#C95C28;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer">Instalar</button>
+    <button onclick="dismissBanner()" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;opacity:.6;padding:0 4px">✕</button>
+  `;
+  document.body.appendChild(banner);
+}
+
+function installPWA() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => { deferredPrompt = null; dismissBanner(); });
+  }
+}
+
+function dismissBanner() {
+  localStorage.setItem('pwa-dismissed', '1');
+  const b = document.getElementById('install-banner');
+  if (b) b.remove();
+}
+</script>
+</body>
+</html>
